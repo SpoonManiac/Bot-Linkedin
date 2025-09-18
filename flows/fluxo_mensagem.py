@@ -8,8 +8,11 @@ def enviar_mensagem(page, minha_rede, mensagem):
     try:
         page.goto(minha_rede, timeout=60000)
         page.wait_for_timeout(3000)
-
-
+        connectionsList = page.locator(f"div:[componentkey='ConnectionsPage_ConnectionsList'")
+        
+        for bloco in connectionsList:
+            if bloco.is_visible():
+                 
         
         # nome_elemento = page.locator("h1").first
         # nome = re.sub(r'\(.*?\)', '', nome_elemento.inner_text()).strip()
