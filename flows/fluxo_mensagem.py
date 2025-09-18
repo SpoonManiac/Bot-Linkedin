@@ -1,9 +1,16 @@
 import re
 import time
-from main import data_inicial
 from utils.config import minha_rede
 
-def enviar_mensagem(page, minha_rede, mensagem):
+def data_conexao(texto):
+
+    meses = {
+        "janeiro": 1, "fevereiro": 2, "março": 3, "abril": 4, "maio": 5,
+        "junho": 6, "julho": 7, "agosto": 8, "setembro": 9, "outubro": 10,
+        "novembro": 11, "dezembro": 12
+    }
+
+def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
     
     try:
         page.goto(minha_rede, timeout=60000)
@@ -11,8 +18,9 @@ def enviar_mensagem(page, minha_rede, mensagem):
         connectionsList = page.locator(f"div:[componentkey='ConnectionsPage_ConnectionsList'")
         
         for bloco in connectionsList:
-            if bloco.is_visible():
-                 
+            if page.locator("div").filter(has_text="Conexão feita em {data_inicial}"):
+                ...
+
         
         # nome_elemento = page.locator("h1").first
         # nome = re.sub(r'\(.*?\)', '', nome_elemento.inner_text()).strip()
