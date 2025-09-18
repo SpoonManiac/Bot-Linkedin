@@ -1,0 +1,8 @@
+Necessário ser uma planilha do Google, para ter certeza vá em arquivo e verifique se tem a opção "Salvar como planilhas do google"
+
+Necessário adicionar na planilha a permissão do "usuário" do bot
+
+Vá em compartilhar --> e adicionar esse e-mail como participante
+
+bot-samara@automacaolinkedin-471017.iam.gserviceaccount.com
+
