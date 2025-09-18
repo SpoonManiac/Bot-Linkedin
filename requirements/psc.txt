@@ -1,0 +1,12 @@
+Se estiver na versão 3.13 do python baixado da microsoft e der erro dizendo que o gspread não estiver instalado mesmo instalando requirents, rode: 
+ py -3.13 -m pip install --upgrade --force-reinstall gspread
+
+vai tentar reinstalar o gspread diretamente na versão que está usando
+depois se quiser testar se está instalado:  py -3.13 -c "import gspread; print(gspread.__version__)"
+
+oauth pode dar erro também por questão de estar descontinuado, rode:
+ py -3.13 -m pip install oauth2client
+
+caso o playwright dê erro também
+py -3.13 -m pip install playwright 
+que instala diretamente na versão do python
