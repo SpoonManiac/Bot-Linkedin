@@ -18,7 +18,9 @@ def main():
     data_inicial = None
 
     if modo == "2":
-        data_inicial = input("Digite a data inicial (dd/mm/aaaa): ").datetime.datetinme.strptime(data_incial, "%d/%m/%Y").date()
+        data_inicial = input("Digite a data inicial (dd/mm/aaaa): ").strip()
+        data_inicial = datetime.datetime.strptime(data_inicial, "%d/%m/%Y").date()
+
         
     with sync_playwright() as pw:
         drive = pw.chromium.launch(headless=False, slow_mo=200)  # headless=True (Padrão) tem o efeito de executar a automação sem o browser estar visível
@@ -86,17 +88,19 @@ def main():
                 "Sua jornada com IA começa aqui.\n\n"
                 "Visite nossa página: https://www.linkedin.com/company/grupogbpa/posts/?feedView=all\n\n"
                 "Conheça os Cases!"
-                )
+            )
+
             status_msg = enviar_mensagem(page, minha_rede, mensagem_base, data_inicial)
                 
             if status_msg == "enviado":
-                    sheet.update_cell(l, 10, hoje)
-                    print(f"Mensagem enviada {hoje}")
-            # else:
-            #         print(f"Não foi pssível enviar mensagem para {link}")
+                print(f"Mensagens enviadas com sucesso em {datetime.date.today().strftime('%d/%m/%Y')}")
+            elif status_msg == "nenhum":
+                print("Nenhuma mensagem foi enviada (nenhuma conexão dentro da data informada).")
+            else:
+                print("Ocorreu um erro ao tentar enviar mensagens.")
                 
+                        
         time.sleep(3)
-
         drive.close()
 
 if __name__ == "__main__":

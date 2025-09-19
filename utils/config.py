@@ -4,9 +4,12 @@ from google.oauth2.service_account import Credentials
 scope = ["https://spreadsheets.google.com/feeds",
           "https://www.googleapis.com/auth/drive"]
 
+
 creds_file = "automacaolinkedin-471017-5052e7cd33ea.json"
 creds = Credentials.from_service_account_file(creds_file, scopes=scope)
 client = gspread.authorize(creds)
+
+
 
 minha_rede = 'https://www.linkedin.com/mynetwork/invite-connect/connections/'
 spreadsheet_url = "https://docs.google.com/spreadsheets/d/1aJ-JsXpFGllgDGdGODmnVIh_jT9oRUAuAahmqHn0tN8/edit?gid=1515599369#gid=1515599369"
