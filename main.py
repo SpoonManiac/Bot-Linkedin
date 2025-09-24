@@ -2,7 +2,7 @@ import os, time, datetime
 from playwright.sync_api import sync_playwright
 from flows.fluxo_conexao import enviar_convite, verifica_status 
 from flows.fluxo_mensagem import enviar_mensagem
-from utils.config import sheet, minha_rede
+from utils.config import sheet_Leads, minha_rede
 import sys
 
 def resource_path(relative_path):
@@ -23,15 +23,19 @@ def main():
 
         
     with sync_playwright() as pw:
-        drive = pw.chromium.launch(headless=False, slow_mo=200)  # headless=True (Padrão) tem o efeito de executar a automação sem o browser estar visível
+        drive = pw.chromium.launch(headless=False, args=["--start-maximized"], slow_mo=200)  # headless=True (Padrão) tem o efeito de executar a automação sem o browser estar visível
 
         # verifica se existe sessão salva
         if os.path.exists("linkedin_state.json"):
-            context = drive.new_context(storage_state="linkedin_state.json")
+            context = drive.new_context(storage_state="linkedin_state.json", viewport= None)
+            
         else:
-            context = drive.new_context()
+            context = drive.new_context(viewport= None)
+            
 
         page = context.new_page()
+        page.evaluate("() => window.moveTo(0,0); window.resizeTo(screen.width, screen.height);")
+
 
         #login manual do linkedin pela primeira vez
         if not os.path.exists("linkedin_state.json"):
@@ -42,9 +46,9 @@ def main():
 
         if modo == "1":
         # parte do sheets
-            links = sheet.col_values(8)  # coluna H
-            datas = sheet.col_values(9)  # coluna I
-            mensagens = sheet.col_values(10) # colouna J
+            links = sheet_Leads.col_values(8)  # coluna H
+            datas = sheet_Leads.col_values(9)  # coluna I
+            mensagens = sheet_Leads.col_values(10) # colouna J
 
             hoje = datetime.date.today().strftime("%d/%m/%Y")
 
@@ -60,7 +64,7 @@ def main():
 
                 perfil_status = verifica_status(page, link)
                 if perfil_status == "não_existe":
-                    sheet.update_cell(l,9,"Não existe")
+                    sheet_Leads.update_cell(l,9,"Não existe")
                     print(f"Linha {l} marcada como 'Não existe'")
                     time.sleep(5)
                     continue
@@ -71,10 +75,10 @@ def main():
                 status = enviar_convite(page, link)  # agora retorna "enviado", "pendente" ou "erro"
 
                 if status in ["enviado", "pendente"]:
-                    sheet.update_cell(l, 9, hoje)  # registra a data mesmo se estiver pendente
+                    sheet_Leads.update_cell(l, 9, hoje)  # registra a data mesmo se estiver pendente
                     print(f"Linha {l} marcada como '{status}' com a data {hoje}")
                 else:
-                    sheet.update_cell(l, 9, "Erro")
+                    sheet_Leads.update_cell(l, 9, "Erro")
                     print(f"Linha {l} não foi possível conectar, marcada como 'Erro'")
 
         elif modo == "2":
@@ -90,7 +94,7 @@ def main():
                 "Conheça os Cases!"
             )
 
-            status_msg = enviar_mensagem(page, minha_rede, mensagem_base, data_inicial)
+            status_msg, enviados = enviar_mensagem(page, minha_rede, mensagem_base, data_inicial)
                 
             if status_msg == "enviado":
                 print(f"Mensagens enviadas com sucesso em {datetime.date.today().strftime('%d/%m/%Y')}")

@@ -2,76 +2,106 @@ import datetime
 import re
 from utils.config import sheet, minha_rede
 
-
-
 def conexao_feita_em(texto):
     meses = {
-        "janeiro": 1, "fevereiro": 2, "março": 3, "abril": 4, "maio": 5,
-        "junho": 6, "julho": 7, "agosto": 8, "setembro": 9, "outubro": 10,
-        "novembro": 11, "dezembro": 12
+        "janeiro": 1, "fevereiro": 2, "março": 3, "mar": 3,
+        "abril": 4, "mai": 5, "maio": 5,
+        "junho": 6, "jul": 7, "julho": 7,
+        "agosto": 8, "ago": 8,
+        "setembro": 9, "set": 9, "set.": 9,
+        "outubro": 10, "out": 10,
+        "novembro": 11, "nov": 11,
+        "dezembro": 12, "dez": 12, "dez.": 12
     }
-    # Exemplo texto: "Conexão feita em 12 de março de 2024"
-    match = re.search(r"(\d{1,2}) de (\w+) de (\d{4})", texto.lower())
+    texto = texto.lower()
+    match = re.search(r"conexão feita em (\d{1,2}) de (\w+)\.? de (\d{4})", texto)
     if match:
         dia, mes, ano = match.groups()
-        numero_mes= meses.get(mes, 0)
-        return datetime.date(int(ano), numero_mes, int(dia))
+        numero_mes = meses.get(mes, 0)
+        if numero_mes:
+            return datetime.date(int(ano), numero_mes, int(dia))
     return None
 
 
 def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
     enviados = []
+
     try:
         page.goto(minha_rede, timeout=60000)
-        page.wait_for_timeout(5000)
+        page.wait_for_timeout(3000)
 
-        conexoes = page.locator("div.entity-result__item")
-        total = conexoes.count()
+        # --- SCROLL AUTOMÁTICO PARA CARREGAR TODAS AS CONEXÕES ---
+        prev_height = 0
+        while True:
+            page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
+            page.wait_for_timeout(2000)
+            curr_height = page.evaluate("document.body.scrollHeight")
+            if curr_height == prev_height:
+                break
+            prev_height = curr_height
 
-        for i in range(total):
-            bloco = conexoes.nth(i)
-            texto_data = bloco.inner_text()
-            print("entrou loop i")
+        page.wait_for_selector('div[data-view-name="connections-list"] > div', timeout=10000)
+        blocos = page.locator('div[data-view-name="connections-list"] > div').all()
 
-            if "Conexão feita em" in texto_data:
-                data_conexao = data_conexao(texto_data)
-                print("Viu se tem 'Conexão feita em'")
+        blocos_validos = []
+        for bloco in blocos:
+            texto_bloco = bloco.inner_text()
+            data_conexao = conexao_feita_em(texto_bloco)
+            if data_conexao and data_conexao >= data_inicial:
+                blocos_validos.append((bloco, data_conexao))
 
-                if data_conexao and data_conexao >= data_inicial:
-                    nome = bloco.locator("span.entity-result__title-text").inner_text().strip()
-                    print(f"[OK] {nome} - {data_conexao.strftime('%d/%m/%Y')}")
+        if not blocos_validos:
+            print("Nenhuma mensagem foi enviada (nenhuma conexão dentro da data informada).")
+            return "nenhum", []
 
-                    if bloco.locator("button:has-text('Mensagem')").is_visible():
-                        bloco.locator("button:has-text('Mensagem')").click()
-                        page.wait_for_timeout(2000)
+        for bloco, data_conexao in blocos_validos:
+            
+            nome_elem = bloco.locator('a[href*="/in/"]').first
+            nome = nome_elem.inner_text().strip()
+            link = nome.elem.get_atributte("href")
+            print(nome)
+            print(f"{nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 
-                        textarea = page.locator("div[role='textbox']").first
-                        textarea.fill(mensagem_base.replace("{{nome}}", nome))
-                        page.keyboard.press("Enter")
-                        print(f"Mensagem enviada para {nome}")
+            botao_mensagem = bloco.locator("span:has-text('Mensagem')").first
+            if botao_mensagem.is_visible():
+                botao_mensagem.click()
+                page.wait_for_timeout(1000)
 
-                        enviados.append({
-                            "nome": nome,
-                            "data_envio": datetime.date.today().strftime("%d/%m/%Y")
-                        })
-                        page.wait_for_timeout(2000)
+                textarea = page.locator("div[role='textbox']").first
+                print("Encontrou a caixa de texto para o envio da mensagem")
+                textarea.fill(mensagem_base.replace("{{nome}}", nome))
+                #botao_enviar = page.locator("button[class='msg-form_send-button']")
+                #print("Encontrou o botão 'Enviar' ")
+                #botao_enviar.click()
+                print(f"Mensagem enviada para {nome}")
 
-        # atualiza a planilha
-        for item in enviados:
-            nome = item["nome"]
-            data_envio = item["data_envio"]
-            try:
-                cell = sheet.find(nome)
-                if cell:
-                    sheet.update_cell(cell.row, 10, data_envio)  # coluna J (10ª)
-                    print(f"Atualizado planilha: {nome} na linha {cell.row} com data {data_envio}")
-                else:
-                    print(f"⚠ Nome {nome} não encontrado na planilha")
-            except Exception as e:
-                print(f"Erro ao atualizar {nome} na planilha: {e}")
+                # aqui adiciona na lista de enviados
+                data_envio = datetime.date.today().strftime("%d/%m/%Y")
+                enviados.append({
+                    "nome": nome,
+                    "data_envio": data_envio
+                })
 
-        return "enviado" if enviados else "nenhum"
+                # adiciona na planilha
+                try:
+                   
+                    celulas = sheet.findall(nome)
+                    if not celulas:
+                        nome = sheet_Envio_Mensagens.col_values(3)
+                        link = sheet_Envio_Mensagens.col_values(8)
+                        data_mensagem = sheet_Envio_Mensagens.col_values(9)
+                        print(f"Adicionado na planilha: {nome} | {data_envio}")
+
+                    else:
+                        print(f"{nome} já existe na planilha, pulando...")
+
+                except Exception as e:
+                    print(f"Erro ao adicionar {nome} na planilha: {e}")
+
+                page.wait_for_timeout(1000)
+
+        return "enviado", enviados
 
     except Exception as e:
         print(f"Erro ao enviar mensagem: {e}")
-        return "erro"
+        return "erro", []
