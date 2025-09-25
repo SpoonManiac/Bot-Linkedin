@@ -1,6 +1,6 @@
 import datetime
 import re
-from utils.config import sheet, minha_rede
+from utils.config import sheet_Envio_Mensagens, minha_rede
 
 def conexao_feita_em(texto):
     meses = {
@@ -58,7 +58,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
             
             nome_elem = bloco.locator('a[href*="/in/"]').first
             nome = nome_elem.inner_text().strip()
-            link = nome.elem.get_atributte("href")
+            link = nome_elem.get_attribute("href")
             print(nome)
             print(f"{nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 
@@ -85,20 +85,18 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 # adiciona na planilha
                 try:
                    
-                    celulas = sheet.findall(nome)
+                    celulas = sheet_Envio_Mensagens.findall(nome)
                     if not celulas:
-                        nome = sheet_Envio_Mensagens.col_values(3)
-                        link = sheet_Envio_Mensagens.col_values(8)
-                        data_mensagem = sheet_Envio_Mensagens.col_values(9)
+                        linha = ["", "", nome, "", "", "", "", link, data_envio]
+                        sheet_Envio_Mensagens.append_row(linha)
                         print(f"Adicionado na planilha: {nome} | {data_envio}")
-
                     else:
                         print(f"{nome} já existe na planilha, pulando...")
-
+                        
                 except Exception as e:
                     print(f"Erro ao adicionar {nome} na planilha: {e}")
 
-                page.wait_for_timeout(1000)
+                    page.wait_for_timeout(1000)
 
         return "enviado", enviados
 
