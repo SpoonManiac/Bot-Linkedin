@@ -56,9 +56,16 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
 
         for bloco, data_conexao in blocos_validos:
             
-            nome_elem = bloco.locator('a[href*="/in/"]').first
-            nome = nome_elem.inner_text().strip()
-            link = nome_elem.get_attribute("href")
+            nome_elem = bloco.locator('p').first
+            page.wait_for_timeout(500)
+            nome = nome_elem.text_content().strip()
+            # if nome:
+            #     nome = nome.strip()
+            # else:
+            #     link = nome_elem.get_attribute("href")
+            #     nome = link.split("/")[-2] # caso o playwright nao consiga pegar o nome por extenso, pra nao retorna nome em branco pega do link
+
+            link = nome_elem.get_attribute('a[href="/in/"]')
             print(nome)
             print(f"{nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 
