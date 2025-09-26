@@ -4,6 +4,12 @@ from flows.fluxo_conexao import enviar_convite, verifica_status
 from flows.fluxo_mensagem import enviar_mensagem
 from utils.config import sheet_Leads, minha_rede
 import sys
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,  # define o nível de logs que será mostrado
+    format="%(levelname)s -%(message)s",  # formato do log
+)
 
 def resource_path(relative_path):
         
@@ -48,7 +54,6 @@ def main():
         # parte do sheets
             links = sheet_Leads.col_values(8)  # coluna H
             datas = sheet_Leads.col_values(9)  # coluna I
-            mensagens = sheet_Leads.col_values(10) # colouna J
 
             hoje = datetime.date.today().strftime("%d/%m/%Y")
 
@@ -59,27 +64,27 @@ def main():
                 #pegando status atual da coluna i, de tem erro reprocessa, senão pula
                 status = datas[l-1] if l < len(datas) else ""
                 if status and status.lower()!= "erro":
-                    print(f"Linha {l} ja processada ({status}), pulando...")
+                    logging.info(f" Linha {l} ja processada ({status}), pulando...")
                     continue
 
                 perfil_status = verifica_status(page, link)
                 if perfil_status == "não_existe":
                     sheet_Leads.update_cell(l,9,"Não existe")
-                    print(f"Linha {l} marcada como 'Não existe'")
+                    logging.info(f" Linha {l} marcada como 'Não existe'")
                     time.sleep(5)
                     continue
 
-                print(f"Processando {link}...")
+                logging.info(f" Processando {link}...")
 
             
                 status = enviar_convite(page, link)  # agora retorna "enviado", "pendente" ou "erro"
 
                 if status in ["enviado", "pendente"]:
                     sheet_Leads.update_cell(l, 9, hoje)  # registra a data mesmo se estiver pendente
-                    print(f"Linha {l} marcada como '{status}' com a data {hoje}")
+                    logging.info(f" Linha {l} marcada como '{status}' com a data {hoje}")
                 else:
                     sheet_Leads.update_cell(l, 9, "Erro")
-                    print(f"Linha {l} não foi possível conectar, marcada como 'Erro'")
+                    logging.info(f" Linha {l} não foi possível conectar, marcada como 'Erro'")
 
         elif modo == "2":
             mensagem_base = (
@@ -97,11 +102,11 @@ def main():
             status_msg, enviados = enviar_mensagem(page, minha_rede, mensagem_base, data_inicial)
                 
             if status_msg == "enviado":
-                print(f"Mensagens enviadas com sucesso em {datetime.date.today().strftime('%d/%m/%Y')}")
+                logging.info(f" Mensagens enviadas com sucesso em {datetime.date.today().strftime('%d/%m/%Y')}")
             elif status_msg == "nenhum":
-                print("Nenhuma mensagem foi enviada (nenhuma conexão dentro da data informada).")
+                logging.info(" Nenhuma mensagem foi enviada (nenhuma conexão dentro da data informada).")
             else:
-                print("Ocorreu um erro ao tentar enviar mensagens.")
+                logging.error(" Ocorreu um erro ao tentar enviar mensagens.")
                 
                         
         time.sleep(3)

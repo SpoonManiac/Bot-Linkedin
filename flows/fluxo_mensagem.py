@@ -1,6 +1,12 @@
 import datetime
 import re
+import logging
 from utils.config import sheet_Envio_Mensagens, minha_rede
+
+logging.basicConfig(
+    level=logging.INFO,  # define o nível de logs que será mostrado
+    format="%(levelname)s -%(message)s",  # formato do log
+)
 
 def conexao_feita_em(texto):
     meses = {
@@ -51,7 +57,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 blocos_validos.append((bloco, data_conexao))
 
         if not blocos_validos:
-            print("Nenhuma mensagem foi enviada (nenhuma conexão dentro da data informada).")
+            logging.info(" Nenhuma mensagem foi enviada (nenhuma conexão dentro da data informada).")
             return "nenhum", []
 
         for bloco, data_conexao in blocos_validos:
@@ -66,23 +72,40 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
             #     nome = link.split("/")[-2] # caso o playwright nao consiga pegar o nome por extenso, pra nao retorna nome em branco pega do link
 
             link = bloco.locator('a[href*="/in/"]').first.get_attribute("href")
-            print(nome)
-            print(f"{nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
+            logging.info( f" {nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 
             botao_mensagem = bloco.locator("span:has-text('Mensagem')").first
             if botao_mensagem.is_visible():
                 botao_mensagem.click()
                 page.wait_for_timeout(1000)
 
-                #historico = 
+                historico = page.locator("p.msg-s-event-listitem__body")
+                if historico.count() > 0:
+                    logging.info(f" Já possui mensagens no histórico, pulando...")
+
+                    fechar_chat = page.locator('button.msg-overlay-bubble-header__control:has-text("Fechar conversa")')
+                    if fechar_chat.is_visible():
+                        fechar_chat.click()
+                        page.wait_for_timeout(500)
+
+                    celulas = sheet_Envio_Mensagens.findall(nome)
+                    if not celulas:
+                        linha = ["", "", nome, "", "", "", "", link, "Já havia mensagens"]
+                        sheet_Envio_Mensagens.append_row(linha)
+                        logging.info(f" {nome} registrado na planilha ")
+                    continue
 
                 textarea = page.locator("div[role='textbox']").first
-                print("Encontrou a caixa de texto para o envio da mensagem")
+                logging.info(" Encontrou a caixa de texto para o envio da mensagem")
                 textarea.fill(mensagem_base.replace("{{nome}}", nome))
+
+                file_input = page.locator('input[type="file"]')
+                file_input.set_input_files("----caminho do arquivo------")
+                page.wait_for_timeout(500)
+
                 botao_enviar = page.get_by_role("button", name="Enviar")
-                print("Encontrou o botão 'Enviar' ")
                 botao_enviar.click()
-                print(f"Mensagem enviada para {nome}")
+                logging.info(f" Mensagem enviada para {nome}")
 
                 fechar_chat = page.locator('button[aria-label="Fechar"]')
                 if fechar_chat.is_visible():
@@ -103,17 +126,17 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                     if not celulas:
                         linha = ["", "", nome, "", "", "", "", link, data_envio]
                         sheet_Envio_Mensagens.append_row(linha)
-                        print(f"Adicionado na planilha: {nome} | {data_envio}")
+                        logging.info(f" Adicionado na planilha: {nome} | {data_envio}")
                     else:
-                        print(f"{nome} já existe na planilha, pulando...")
+                        logging.info(f" {nome} já existe na planilha, pulando...")
                         
                 except Exception as e:
-                    print(f"Erro ao adicionar {nome} na planilha: {e}")
+                    logging.info(f" Erro ao adicionar {nome} na planilha: {e}")
 
                     page.wait_for_timeout(1000)
 
         return "enviado", enviados
 
     except Exception as e:
-        print(f"Erro ao enviar mensagem: {e}")
+        logging.error(f" Erro ao enviar mensagem: {e}")
         return "erro", []
