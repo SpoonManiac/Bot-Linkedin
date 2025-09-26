@@ -53,7 +53,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
         for bloco in blocos:
             texto_bloco = bloco.inner_text()
             data_conexao = conexao_feita_em(texto_bloco)
-            if data_conexao and data_conexao >= data_inicial:
+            if data_conexao and data_conexao == data_inicial:
                 blocos_validos.append((bloco, data_conexao))
 
         if not blocos_validos:
@@ -65,12 +65,6 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
             nome_elem = bloco.locator('p').first
             page.wait_for_timeout(500)
             nome = nome_elem.text_content().strip()
-            # if nome:
-            #     nome = nome.strip()
-            # else:
-            #     link = nome_elem.get_attribute("href")
-            #     nome = link.split("/")[-2] # caso o playwright nao consiga pegar o nome por extenso, pra nao retorna nome em branco pega do link
-
             link = bloco.locator('a[href*="/in/"]').first.get_attribute("href")
             logging.info( f" {nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 
@@ -100,7 +94,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 textarea.fill(mensagem_base.replace("{{nome}}", nome))
 
                 file_input = page.locator('input[type="file"]')
-                file_input.set_input_files("----caminho do arquivo------")
+                file_input.set_input_files("utils\Apresentacao_GBPA.pdf")
                 page.wait_for_timeout(500)
 
                 botao_enviar = page.get_by_role("button", name="Enviar")
