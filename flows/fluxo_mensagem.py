@@ -65,7 +65,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
             #     link = nome_elem.get_attribute("href")
             #     nome = link.split("/")[-2] # caso o playwright nao consiga pegar o nome por extenso, pra nao retorna nome em branco pega do link
 
-            link = nome_elem.get_attribute('a[href="/in/"]')
+            link = bloco.locator('a[href*="/in/"]').first.get_attribute("href")
             print(nome)
             print(f"{nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 
@@ -74,13 +74,20 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 botao_mensagem.click()
                 page.wait_for_timeout(1000)
 
+                #historico = 
+
                 textarea = page.locator("div[role='textbox']").first
                 print("Encontrou a caixa de texto para o envio da mensagem")
                 textarea.fill(mensagem_base.replace("{{nome}}", nome))
-                #botao_enviar = page.locator("button[class='msg-form_send-button']")
-                #print("Encontrou o botão 'Enviar' ")
-                #botao_enviar.click()
+                botao_enviar = page.get_by_role("button", name="Enviar")
+                print("Encontrou o botão 'Enviar' ")
+                botao_enviar.click()
                 print(f"Mensagem enviada para {nome}")
+
+                fechar_chat = page.locator('button[aria-label="Fechar"]')
+                if fechar_chat.is_visible():
+                    fechar_chat.click()
+                    page.wait_for_timeout(500)
 
                 # aqui adiciona na lista de enviados
                 data_envio = datetime.date.today().strftime("%d/%m/%Y")
