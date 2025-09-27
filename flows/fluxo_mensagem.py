@@ -3,11 +3,6 @@ import re
 import logging
 from utils.config import sheet_Envio_Mensagens, minha_rede
 
-logging.basicConfig(
-    level=logging.INFO,  # define o nível de logs que será mostrado
-    format="%(levelname)s -%(message)s",  # formato do log
-)
-
 def conexao_feita_em(texto):
     meses = {
         "janeiro": 1, "fevereiro": 2, "março": 3, "mar": 3,
@@ -36,7 +31,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
         page.goto(minha_rede, timeout=60000)
         page.wait_for_timeout(3000)
 
-        # --- SCROLL AUTOMÁTICO PARA CARREGAR TODAS AS CONEXÕES ---
+        # Scroll para carregar as conexões
         prev_height = 0
         while True:
             page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
@@ -93,15 +88,21 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 logging.info(" Encontrou a caixa de texto para o envio da mensagem")
                 textarea.fill(mensagem_base.replace("{{nome}}", nome))
 
-                file_input = page.locator('input[type="file"]')
-                file_input.set_input_files("utils\Apresentacao_GBPA.pdf")
+                # botao_anexar = page.locator('button[aria-label*="Anexar arquivo"]')
+                # botao_anexar.click()
+                # print("clicou no botao anexar")
+                # page.wait_for_timeout(1000)
+
+                file_input = page.locator('input[type="file"][accept*="pdf"]').first
+                file_input.set_input_files("utils/Apresentacao_GBPA.pdf")
+                logging.info(" Arquivo anexado com sucesso!")
                 page.wait_for_timeout(500)
 
                 botao_enviar = page.get_by_role("button", name="Enviar")
                 botao_enviar.click()
                 logging.info(f" Mensagem enviada para {nome}")
 
-                fechar_chat = page.locator('button[aria-label="Fechar"]')
+                fechar_chat = page.locator('button.msg-overlay-bubble-header__control[aria-label*="Fechar conversa"]')
                 if fechar_chat.is_visible():
                     fechar_chat.click()
                     page.wait_for_timeout(500)

@@ -1,4 +1,5 @@
 import gspread
+import logging
 from google.oauth2.service_account import Credentials
 
 scope = ["https://spreadsheets.google.com/feeds",
@@ -21,6 +22,6 @@ try:
     sheet_Envio_Mensagens = sheet.worksheet("Envio de Mensagens")
 except gspread.exceptions.WorksheetNotFound:
     sheet_Envio_Mensagens = sheet.add_worksheet(title="Envio de Mensagens", rows="100", cols="20")
-    print("Worksheet 'Envio de Mensagens' criada pois não existia.")
+    logging.info(" Worksheet 'Envio de Mensagens' criada pois não existia.")
     cabecalho = ["EMPRESA", "CONTATO", "NOME", "SEGMENTO", "EMAIL", "CARGO", "TELEFONE", "LINKEDIN", "DATA MENSAGEM"]
     sheet_Envio_Mensagens.append_row(cabecalho)
