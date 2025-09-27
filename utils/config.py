@@ -13,8 +13,7 @@ client = gspread.authorize(creds)
 
 
 minha_rede = 'https://www.linkedin.com/mynetwork/invite-connect/connections/'
-spreadsheet_url = "https://docs.google.com/spreadsheets/d/1aJ-JsXpFGllgDGdGODmnVIh_jT9oRUAuAahmqHn0tN8/edit?gid=1515599369#gid=1515599369"
-#spreadsheet_url = input("Insira o Link da planilha do Google: ").strip()
+spreadsheet_url = input("Insira o Link da planilha do Google: ").strip()
 sheet = client.open_by_url(spreadsheet_url)
 sheet_Leads = sheet.worksheet("Leads")
 try:
