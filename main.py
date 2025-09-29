@@ -7,7 +7,7 @@ import sys
 import logging
 
 logging.basicConfig(
-    level=logging.DEBUG,  # define o nível de logs que será mostrado
+    level=logging.INFO,  # define o nível de logs que será mostrado
     format="%(levelname)s -%(message)s",  # formato do log
 )
 

@@ -12,8 +12,8 @@ def enviar_convite(page, link):
         nome = re.sub(r'\(.*?\)', '',nome_elemento.inner_text()).strip()
         aria_label = f"Convidar {nome} para se conectar"
 
-        logging.debug(f" Nome extraído: '{nome}'")
-        logging.debug(f" aria-label montado: '{aria_label}'")
+        print(f"DEBUG - Nome extraído: '{nome}'")
+        print(f"DEBUG - aria-label montado: '{aria_label}'")
 
         
         botao_conectar = page.locator(f'button:has-text("Conectar")').first

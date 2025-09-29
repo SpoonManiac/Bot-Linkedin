@@ -48,7 +48,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
         for bloco in blocos:
             texto_bloco = bloco.inner_text()
             data_conexao = conexao_feita_em(texto_bloco)
-            if data_conexao and data_conexao == data_inicial:
+            if data_conexao and data_conexao >= data_inicial:
                 blocos_validos.append((bloco, data_conexao))
 
         if not blocos_validos:
