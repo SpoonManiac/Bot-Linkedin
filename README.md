@@ -6,13 +6,13 @@ Um bot criado para auxiliar no processo de conectar-se com usuários no **Linked
 
 ## 📋 Sumário
 
-- [Funcionalidades](#funcionalidades)
-- [Arquitetura / Tecnologias usadas](#arquitetura---tecnologias-usadas)
-- [Pré-requisitos](#pré-requisitos)
-- [Como usar / configurar](#como-usar---configurar)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Contribuição](#contribuição)
-- [Avisos / Considerações legais](#avisos---considerações-legais)
+* [Funcionalidades](#funcionalidades)
+* [Arquitetura / Tecnologias usadas](#arquitetura---tecnologias-usadas)
+* [Pré-requisitos](#pré-requisitos)
+* [Como usar / configurar](#como-usar---configurar)
+* [Estrutura do projeto](#estrutura-do-projeto)
+* [Contribuição](#contribuição)
+* [Avisos / Considerações legais](#avisos--consideracoes-legais)
 
 ---
 
@@ -39,7 +39,7 @@ Um bot criado para auxiliar no processo de conectar-se com usuários no **Linked
 Antes de executar o bot, você precisará:
 
 * Ter **Python 3.13+** (ou versão compatível) instalado
-* Instalar dependências (veja seção [Como usar / configurar](#como-usar--configurar))
+* Instalar dependências (veja seção [Como usar / configurar](#como-usar---configurar))
 * Credenciais de acesso à **Google Sheets API** (arquivo JSON)
 * Uma planilha no Google Sheets configurada com as colunas que o bot espera (ex: `Empresa`, `Contato`, `Primeiro nome`, `Segmento`, `E-mail`, `Cargo`, `Telefone`, `Linkedin`, `Data solicitação`, etc.)
 * Conta no LinkedIn (atenção às políticas da plataforma)
@@ -50,43 +50,43 @@ Antes de executar o bot, você precisará:
 
 1. **Clone este repositório:**
 
-   ```bash
-   git clone https://github.com/SpoonManiac/Bot-Linkedin.git
-   cd Bot-Linkedin
-   ```
+```bash
+git clone https://github.com/SpoonManiac/Bot-Linkedin.git
+cd Bot-Linkedin
+```
 
 2. **Crie um ambiente virtual (opcional, mas recomendado):**
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # no Linux/macOS
-   .\venv\Scripts\activate   # no Windows
-   ```
+```bash
+python -m venv venv
+source venv/bin/activate  # no Linux/macOS
+.\venv\Scripts\activate   # no Windows
+```
 
 3. **Instale as dependências:**
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
 4. **Configure as credenciais do Google:**
 
-   * Siga as instruções da [Google Sheets API](https://developers.google.com/sheets/api/quickstart/python) para gerar credenciais (arquivo JSON).
-   * Ajuste o código para apontar para esse arquivo de credenciais.
-   * Compartilhe sua planilha com o e-mail da credencial gerada.
+* Siga as instruções da [Google Sheets API](https://developers.google.com/sheets/api/quickstart/python) para gerar credenciais (arquivo JSON).
+* Ajuste o código para apontar para esse arquivo de credenciais.
+* Compartilhe sua planilha com o e-mail da credencial gerada.
 
 5. **Prepare a planilha de alvos:**
 
-   * Crie as colunas esperadas pelo bot (`Empresa`, `Contato`, `Primeiro nome`, `Segmento`, `E-mail`, `Cargo`, `Telefone`, `Linkedin`, `Data solicitação`, etc.).
-   * Certifique-se de que os cabeçalhos e estrutura estejam compatíveis com o esperado pelo código.
+* Crie as colunas esperadas pelo bot (`Empresa`, `Contato`, `Primeiro nome`, `Segmento`, `E-mail`, `Cargo`, `Telefone`, `Linkedin`, `Data solicitação`, etc.).
+* Certifique-se de que os cabeçalhos e estrutura estejam compatíveis com o esperado pelo código.
 
 6. **Execute o bot:**
 
-  run.bat<br>
-  ou
-   ```bash
-   python main.py
-   ```
+```bash
+run.bat
+# ou
+python main.py
+```
 
 ---
 
@@ -105,8 +105,6 @@ Antes de executar o bot, você precisará:
 ---
 
 ## 🤝 Contribuição
-
-Contribuições são bem-vindas!
 
 * Abra *issues* para sugerir melhorias ou reportar bugs.
 * Envie *pull requests* com novas funcionalidades, correções ou refinamentos.
