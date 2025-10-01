@@ -6,13 +6,13 @@ Um bot criado para auxiliar no processo de conectar-se com usuários no **Linked
 
 ## 📋 Sumário
 
-* [Funcionalidades](#funcionalidades)
-* [Arquitetura / Tecnologias usadas](#arquitetura--tecnologias-usadas)
-* [Pré-requisitos](#pré-requisitos)
-* [Como usar / configurar](#como-usar--configurar)
-* [Estrutura do projeto](#estrutura-do-projeto)
-* [Contribuição](#contribuição)
-* [Avisos / Considerações legais](#avisos--considerações-legais)
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura / Tecnologias usadas](#arquitetura--tecnologias-usadas)
+- [Pré-requisitos](#pré-requisitos)
+- [Como usar / configurar](#como-usar--configurar)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Contribuição](#contribuição)
+- [Avisos / Considerações legais](#avisos--considerações-legais)
 
 ---
 
