@@ -4,18 +4,6 @@ Um bot criado para auxiliar no processo de conectar-se com usuários no **Linked
 
 ---
 
-## 📋 Sumário
-
-* [Funcionalidades](#funcionalidades)
-* [Arquitetura / Tecnologias usadas](#arquitetura---tecnologias-usadas)
-* [Pré-requisitos](#pré-requisitos)
-* [Como usar / configurar](#como-usar---configurar)
-* [Estrutura do projeto](#estrutura-do-projeto)
-* [Contribuição](#contribuição)
-* [Avisos / Considerações legais](#avisos--consideracoes-legais)
-
----
-
 ## 🚀 Funcionalidades
 
 * Automatiza o envio de solicitações de conexão no LinkedIn a partir de uma lista de alvos
