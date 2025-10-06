@@ -59,7 +59,18 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
             
             nome_elem = bloco.locator('p').first
             page.wait_for_timeout(500)
-            nome = nome_elem.text_content().strip()
+            nome_completo = nome_elem.text_content().strip()
+            partes_do_nome = nome_completo.split()
+
+            nomes_compostos = ["Ana", "Maria", "José", "João"]
+
+            if partes_do_nome and partes_do_nome[0] in nomes_compostos and len(partes_do_nome) > 1:
+                nome = f"{partes_do_nome[0]} {partes_do_nome[1]}"
+            elif partes_do_nome:
+                nome = partes_do_nome[0] #primeiro nome
+            else:
+                nome = ""
+                
             link = bloco.locator('a[href*="/in/"]').first.get_attribute("href")
             logging.info( f" {nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 

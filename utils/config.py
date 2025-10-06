@@ -13,6 +13,7 @@ client = gspread.authorize(creds)
 
 
 minha_rede = 'https://www.linkedin.com/mynetwork/invite-connect/connections/'
+
 spreadsheet_url = input("Insira o Link da planilha do Google: ").strip()
 sheet = client.open_by_url(spreadsheet_url)
 sheet_Leads = sheet.worksheet("Leads")
