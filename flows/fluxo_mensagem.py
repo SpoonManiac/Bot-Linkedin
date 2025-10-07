@@ -77,7 +77,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
             botao_mensagem = bloco.locator("span:has-text('Mensagem')").first
             if botao_mensagem.is_visible():
                 botao_mensagem.click()
-                page.wait_for_timeout(1000)
+                page.wait_for_timeout(1500)
 
                 historico = page.locator("p.msg-s-event-listitem__body")
                 if historico.count() > 0:
@@ -86,7 +86,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                     fechar_chat = page.locator('button.msg-overlay-bubble-header__control:has-text("Fechar conversa")')
                     if fechar_chat.is_visible():
                         fechar_chat.click()
-                        page.wait_for_timeout(500)
+                        page.wait_for_timeout(1500)
 
                     celulas = sheet_Envio_Mensagens.findall(nome)
                     if not celulas:
@@ -107,16 +107,17 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 file_input = page.locator('input[type="file"][accept*="pdf"]').first
                 file_input.set_input_files("utils/Apresentacao_GBPA.pdf")
                 logging.info(" Arquivo anexado com sucesso!")
-                page.wait_for_timeout(500)
+                page.wait_for_timeout(1500)
 
                 botao_enviar = page.get_by_role("button", name="Enviar")
                 botao_enviar.click()
                 logging.info(f" Mensagem enviada para {nome}")
+                page.wait_for_timeout(1500)
 
                 fechar_chat = page.locator('button.msg-overlay-bubble-header__control[aria-label*="Fechar conversa"]')
                 if fechar_chat.is_visible():
                     fechar_chat.click()
-                    page.wait_for_timeout(500)
+                    page.wait_for_timeout(1500)
 
                 # aqui adiciona na lista de enviados
                 data_envio = datetime.date.today().strftime("%d/%m/%Y")
