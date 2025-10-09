@@ -109,15 +109,20 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 logging.info(" Arquivo anexado com sucesso!")
                 page.wait_for_timeout(1500)
 
-                botao_enviar = page.get_by_role("button", name="Enviar")
-                botao_enviar.click()
-                logging.info(f" Mensagem enviada para {nome}")
-                page.wait_for_timeout(1500)
+                botao_enviar = page.get_by_role("button", name="Enviar").first
+                if botao_enviar.is_visible():
+                    botao_enviar.click()
+                    logging.info(f" Mensagem enviada para {nome}")
+                    page.wait_for_timeout(1500)
+                else:
+                    logging.error(f"Botão enviar não encontrado.")
 
                 fechar_chat = page.locator('button.msg-overlay-bubble-header__control[aria-label*="Fechar conversa"]')
                 if fechar_chat.is_visible():
                     fechar_chat.click()
                     page.wait_for_timeout(1500)
+                else:
+                    logging.error(f"Botão de fechar não encontrado")
 
                 # aqui adiciona na lista de enviados
                 data_envio = datetime.date.today().strftime("%d/%m/%Y")
