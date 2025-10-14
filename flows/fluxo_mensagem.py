@@ -80,20 +80,20 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 page.wait_for_timeout(1500)
 
                 historico = page.locator("p.msg-s-event-listitem__body")
-                # if historico.count() > 0:
-                #     logging.info(f" Já possui mensagens no histórico, pulando...")
+                if historico.count() > 0:
+                    logging.info(f" Já possui mensagens no histórico, pulando...")
 
-                #     fechar_chat = page.locator('button.msg-overlay-bubble-header__control:has-text("Fechar conversa")')
-                #     if fechar_chat.is_visible():
-                #         fechar_chat.click()
-                #         page.wait_for_timeout(1500)
+                    fechar_chat = page.locator('button.msg-overlay-bubble-header__control:has-text("Fechar conversa")')
+                    if fechar_chat.is_visible():
+                        fechar_chat.click()
+                        page.wait_for_timeout(1500)
 
-                #     celulas = sheet_Envio_Mensagens.findall(nome)
-                #     if not celulas:
-                #         linha = ["", "", nome, "", "", "", "", link, "Já havia mensagens"]
-                #         sheet_Envio_Mensagens.append_row(linha)
-                #         logging.info(f" {nome} registrado na planilha ")
-                #     continue
+                    celulas = sheet_Envio_Mensagens.findall(nome)
+                    if not celulas:
+                        linha = ["", "", nome, "", "", "", "", link, "Já havia mensagens"]
+                        sheet_Envio_Mensagens.append_row(linha)
+                        logging.info(f" {nome} registrado na planilha ")
+                    continue
 
                 textarea = page.locator("div[role='textbox']").first
                 logging.info(" Encontrou a caixa de texto para o envio da mensagem")
