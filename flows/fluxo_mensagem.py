@@ -48,7 +48,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
         for bloco in blocos:
             texto_bloco = bloco.inner_text()
             data_conexao = conexao_feita_em(texto_bloco)
-            if data_conexao and data_conexao >= data_inicial:
+            if data_conexao and data_conexao == data_inicial:
                 blocos_validos.append((bloco, data_conexao))
 
         if not blocos_validos:
@@ -99,23 +99,42 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 logging.info(" Encontrou a caixa de texto para o envio da mensagem")
                 textarea.fill(mensagem_base.replace("{{nome}}", nome))
 
-                # botao_anexar = page.locator('button[aria-label*="Anexar arquivo"]')
-                # botao_anexar.click()
-                # print("clicou no botao anexar")
-                # page.wait_for_timeout(1000)
-
                 file_input = page.locator('input[type="file"][accept*="pdf"]').first
                 file_input.set_input_files("utils/Apresentacao_GBPA.pdf")
                 logging.info(" Arquivo anexado com sucesso!")
                 page.wait_for_timeout(1500)
 
+
                 botao_enviar = page.get_by_role("button", name="Enviar").first
-                if botao_enviar.is_visible():
-                    botao_enviar.click()
+                try:
+                    # Tenta identificar o container do chat flutuante
+                    page.evaluate("""
+                        () => {
+                            const chatOverlay = document.querySelector('.msg-overlay-conversation-bubble, .msg-form__container');
+                            if (chatOverlay) {
+                                chatOverlay.scrollTop = chatOverlay.scrollHeight;
+                                chatOverlay.scrollIntoView({behavior: 'auto', block: 'end'});
+                            }
+                        }
+                    """)
+                    page.wait_for_timeout(1200)
+
+                    # Se ainda não está visível, rola até o botão em si
+                    if not botao_enviar.is_visible():
+                        page.evaluate("""
+                            (btn) => {
+                                btn.scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});
+                            }
+                        """, botao_enviar.element_handle())
+                        page.wait_for_timeout(800)
+
+                    # Clica forçando, já que o LinkedIn pode sobrepor elementos
+                    botao_enviar.click(force=True)
                     logging.info(f" Mensagem enviada para {nome}")
                     page.wait_for_timeout(1500)
-                else:
-                    logging.error(f"Botão enviar não encontrado.")
+
+                except Exception as e:
+                    logging.error(f"Falha ao clicar em 'Enviar' para {nome}: {e}")
 
                 fechar_chat = page.locator('button.msg-overlay-bubble-header__control[aria-label*="Fechar conversa"]')
                 if fechar_chat.is_visible():
