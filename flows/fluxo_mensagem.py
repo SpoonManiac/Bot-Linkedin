@@ -48,7 +48,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
         for bloco in blocos:
             texto_bloco = bloco.inner_text()
             data_conexao = conexao_feita_em(texto_bloco)
-            if data_conexao and data_conexao >= data_inicial:
+            if data_conexao and data_conexao == data_inicial:
                 blocos_validos.append((bloco, data_conexao))
 
         if not blocos_validos:
@@ -59,14 +59,25 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
             
             nome_elem = bloco.locator('p').first
             page.wait_for_timeout(500)
-            nome = nome_elem.text_content().strip()
+            nome_completo = nome_elem.text_content().strip()
+            partes_do_nome = nome_completo.split()
+
+            nomes_compostos = ["Ana", "Maria", "José", "João"]
+
+            if partes_do_nome and partes_do_nome[0] in nomes_compostos and len(partes_do_nome) > 1:
+                nome = f"{partes_do_nome[0]} {partes_do_nome[1]}"
+            elif partes_do_nome:
+                nome = partes_do_nome[0] #primeiro nome
+            else:
+                nome = ""
+                
             link = bloco.locator('a[href*="/in/"]').first.get_attribute("href")
             logging.info( f" {nome} - Conectados desde -> {data_conexao.strftime('%d/%m/%Y')}")
 
             botao_mensagem = bloco.locator("span:has-text('Mensagem')").first
             if botao_mensagem.is_visible():
                 botao_mensagem.click()
-                page.wait_for_timeout(1000)
+                page.wait_for_timeout(1500)
 
                 historico = page.locator("p.msg-s-event-listitem__body")
                 if historico.count() > 0:
@@ -75,7 +86,7 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                     fechar_chat = page.locator('button.msg-overlay-bubble-header__control:has-text("Fechar conversa")')
                     if fechar_chat.is_visible():
                         fechar_chat.click()
-                        page.wait_for_timeout(500)
+                        page.wait_for_timeout(1500)
 
                     celulas = sheet_Envio_Mensagens.findall(nome)
                     if not celulas:
@@ -88,24 +99,49 @@ def enviar_mensagem(page, minha_rede, mensagem_base, data_inicial):
                 logging.info(" Encontrou a caixa de texto para o envio da mensagem")
                 textarea.fill(mensagem_base.replace("{{nome}}", nome))
 
-                # botao_anexar = page.locator('button[aria-label*="Anexar arquivo"]')
-                # botao_anexar.click()
-                # print("clicou no botao anexar")
-                # page.wait_for_timeout(1000)
-
                 file_input = page.locator('input[type="file"][accept*="pdf"]').first
                 file_input.set_input_files("utils/Apresentacao_GBPA.pdf")
                 logging.info(" Arquivo anexado com sucesso!")
-                page.wait_for_timeout(500)
+                page.wait_for_timeout(1500)
 
-                botao_enviar = page.get_by_role("button", name="Enviar")
-                botao_enviar.click()
-                logging.info(f" Mensagem enviada para {nome}")
+
+                botao_enviar = page.get_by_role("button", name="Enviar").first
+                try:
+                    # Tenta identificar o container do chat flutuante
+                    page.evaluate("""
+                        () => {
+                            const chatOverlay = document.querySelector('.msg-overlay-conversation-bubble, .msg-form__container');
+                            if (chatOverlay) {
+                                chatOverlay.scrollTop = chatOverlay.scrollHeight;
+                                chatOverlay.scrollIntoView({behavior: 'auto', block: 'end'});
+                            }
+                        }
+                    """)
+                    page.wait_for_timeout(1200)
+
+                    # Se ainda não está visível, rola até o botão em si
+                    if not botao_enviar.is_visible():
+                        page.evaluate("""
+                            (btn) => {
+                                btn.scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});
+                            }
+                        """, botao_enviar.element_handle())
+                        page.wait_for_timeout(800)
+
+                    # Clica forçando, já que o LinkedIn pode sobrepor elementos
+                    botao_enviar.click(force=True)
+                    logging.info(f" Mensagem enviada para {nome}")
+                    page.wait_for_timeout(1500)
+
+                except Exception as e:
+                    logging.error(f"Falha ao clicar em 'Enviar' para {nome}: {e}")
 
                 fechar_chat = page.locator('button.msg-overlay-bubble-header__control[aria-label*="Fechar conversa"]')
                 if fechar_chat.is_visible():
                     fechar_chat.click()
-                    page.wait_for_timeout(500)
+                    page.wait_for_timeout(1500)
+                else:
+                    logging.error(f"Botão de fechar não encontrado")
 
                 # aqui adiciona na lista de enviados
                 data_envio = datetime.date.today().strftime("%d/%m/%Y")
