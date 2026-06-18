@@ -2,7 +2,6 @@
 
 ![Python](https://img.shields.io/badge/Python-3.13%2B-orange)
 ![GitHub issues](https://img.shields.io/github/issues/SpoonManiac/Bot-Linkedin)
-<<<<<<< HEAD
 =======
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/SpoonManiac/Bot-Linkedin?&color=yellow)
 >>>>>>> edddd84ad47124e0b107a4286afcdb839e4b6bb7
