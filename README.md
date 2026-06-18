@@ -4,7 +4,6 @@
 ![GitHub issues](https://img.shields.io/github/issues/SpoonManiac/Bot-Linkedin)
 =======
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/SpoonManiac/Bot-Linkedin?&color=yellow)
->>>>>>> edddd84ad47124e0b107a4286afcdb839e4b6bb7
 
 Um bot criado para auxiliar no processo de conectar-se com usuários no **LinkedIn**, utilizando **Python**, **Playwright** e **Google Spreadsheet** como banco de dados.
 
